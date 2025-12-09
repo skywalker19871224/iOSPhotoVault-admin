@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) throw new Error('Failed to list files');
             const objects = await res.json();
 
+            // Sort: Newest first
+            objects.sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded));
+
             renderFiles(objects);
         } catch (err) {
             filesContainer.textContent = 'エラーが発生しました: ' + err.message;
