@@ -15,6 +15,8 @@
 - R2 バケット内のファイル一覧表示
 - ファイル削除 API
 
+> NOTE: ホーム画面（index.html）は廃止し、管理画面へのアクセスは `upload.html` から直接行います。
+
 ---
 
 ## 2. ディレクトリ構成
@@ -22,13 +24,11 @@
 iOSPhotoVault_admin/
 │
 ├── public/
-│   ├── index.html
 │   ├── upload.html
 │   ├── css/
 │   │   └── style.css
 │   └── js/
-│       ├── upload-ui.js
-│       └── list.js
+│       └── upload-ui.js
 │
 ├── functions/
 │   ├── generateUploadUrl.js
@@ -71,34 +71,7 @@ bucket_name = "user-gallery"
 
 ---
 
-### 4-1. public/index.html
-```
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="./css/style.css" />
-</head>
-<body>
-  <header>
-    <h1>管理ダッシュボード</h1>
-    <nav>
-      <a href="./upload.html">📤 アップロード</a>
-      <a href="#" id="refreshList">🔄 更新</a>
-    </nav>
-  </header>
-
-  <section id="files"></section>
-
-  <script src="./js/list.js"></script>
-</body>
-</html>
-```
-
----
-
-### 4-2. public/upload.html
+### 4-1. public/upload.html
 ```
 <!DOCTYPE html>
 <html lang="ja">
@@ -122,14 +95,14 @@ bucket_name = "user-gallery"
     <p id="status">待機中…</p>
   </div>
 
-  <script src="./js/upload-ui.js"></script>
+<script src="./js/upload-ui.js"></script>
 </body>
 </html>
 ```
 
 ---
 
-### 4-3. public/css/style.css
+### 4-2. public/css/style.css
 ```
 body {
   background: #1e1e1e;
@@ -156,7 +129,7 @@ progress {
 
 ---
 
-### 4-4. public/js/upload-ui.js
+### 4-3. public/js/upload-ui.js
 ```
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
