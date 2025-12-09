@@ -67,7 +67,7 @@ async function upload(file) {
             if (xhr.status === 200 || xhr.status === 201) {
                 console.log("[DEBUG] Upload success!");
                 statusText.className = 'status-success';
-                statusText.innerHTML = "✅ アップロード完了！<br>一覧画面に戻るか、続けてファイルをドロップしてください。";
+                statusText.innerHTML = "✅ アップロード完了！<br>続けてファイルをドロップできます。";
                 progressBar.value = 100;
             } else {
                 console.error("[DEBUG] Upload failed. Response:", xhr.responseText);
