@@ -27,12 +27,14 @@ fileInput.onchange = () => {
 
 async function upload(file) {
     progressWrap.style.display = "block";
-    statusText.textContent = `署名URL取得中…`;
+    // Reset status
+    statusText.className = 'status-processing';
+    statusText.textContent = `⏳ 署名URL取得中…`;
 
     const res = await fetch(`/generateUploadUrl?name=${encodeURIComponent(file.name)}`);
     const { uploadUrl } = await res.json();
 
-    statusText.textContent = "アップロード中…";
+    statusText.textContent = "🚀 アップロード中…";
 
     const xhr = new XMLHttpRequest();
     xhr.open("PUT", uploadUrl, true);
@@ -42,22 +44,24 @@ async function upload(file) {
         if (e.lengthComputable) {
             const percent = Math.round((e.loaded / e.total) * 100);
             progressBar.value = percent;
-            statusText.textContent = `${percent}%`;
+            statusText.textContent = `🚀 アップロード中… ${percent}%`;
         }
     };
 
     xhr.onload = () => {
         if (xhr.status === 200) {
-            statusText.textContent = "アップロード完了！";
+            statusText.className = 'status-success';
+            statusText.innerHTML = "✅ アップロード完了！<br>一覧画面に戻るか、続けてファイルをドロップしてください。";
             progressBar.value = 100;
         } else {
-            statusText.textContent = `エラー: ${xhr.status}`;
+            statusText.className = 'status-error';
+            statusText.textContent = `❌ エラー: ${xhr.status}`;
         }
     };
 
     xhr.onerror = () => {
-        statusText.textContent = "通信エラー";
+        statusText.className = 'status-error';
+        statusText.textContent = "❌ 通信エラー";
     };
-
     xhr.send(file);
 }
