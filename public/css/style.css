@@ -1,0 +1,165 @@
+/* Admin UI Base Styles */
+:root {
+    --bg-color: #f4f6f8;
+    --card-bg: #ffffff;
+    --text-primary: #1a202c;
+    --text-secondary: #718096;
+    --accent-color: #3182ce;
+    --accent-hover: #2b6cb0;
+    --border-color: #e2e8f0;
+    --header-height: 60px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a202c;
+        --card-bg: #2d3748;
+        --text-primary: #f7fafc;
+        --text-secondary: #a0aec0;
+        --accent-color: #63b3ed;
+        --accent-hover: #4299e1;
+        --border-color: #4a5568;
+    }
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.5;
+    padding-top: var(--header-height);
+}
+
+header {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+nav a {
+    margin-left: 20px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+nav a:hover, nav a.active {
+    color: var(--accent-color);
+}
+
+main {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.btn {
+    display: inline-block;
+    background-color: var(--accent-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+    background-color: transparent;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.file-drop-area {
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: border-color 0.2s;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.file-drop-area:hover, .file-drop-area.drag-over {
+    border-color: var(--accent-color);
+    background-color: rgba(66, 153, 225, 0.05);
+}
+
+.status-box {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 6px;
+    display: none;
+}
+
+.status-box.success {
+    background-color: rgba(72, 187, 120, 0.1);
+    color: #2f855a;
+    display: block;
+}
+
+.status-box.error {
+    background-color: rgba(245, 101, 101, 0.1);
+    color: #c53030;
+    display: block;
+}
