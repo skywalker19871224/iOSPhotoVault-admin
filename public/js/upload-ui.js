@@ -64,22 +64,48 @@ async function upload(file) {
 
         xhr.onload = () => {
             console.log("[DEBUG] XHR State:", xhr.readyState, "Status:", xhr.status);
+            const resultArea = document.getElementById('resultArea');
+            if (resultArea) resultArea.innerHTML = ''; // Clear previous
+
             if (xhr.status === 200 || xhr.status === 201) {
                 console.log("[DEBUG] Upload success!");
                 statusText.className = 'status-success';
-                statusText.innerHTML = "✅ アップロード完了！<br>続けてファイルをドロップできます。";
+                statusText.innerHTML = "✅ Upload Success";
                 progressBar.value = 100;
+
+                // Remove query params to show the clean object URL
+                const cleanUrl = uploadUrl.split('?')[0];
+
+                if (resultArea) {
+                    resultArea.innerHTML = `
+                      <div style="color: #4CAF50; margin-bottom: 10px; font-weight: bold;">アップロード成功</div>
+                      <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.9em; word-break: break-all;">
+                        <a href="${cleanUrl}" target="_blank" style="color: #63b3ed; text-decoration: underline;">${cleanUrl}</a>
+                      </div>
+                    `;
+                }
             } else {
                 console.error("[DEBUG] Upload failed. Response:", xhr.responseText);
                 statusText.className = 'status-error';
-                statusText.innerHTML = `❌ アップロード失敗: ${xhr.status}<br><small>${xhr.responseText.substring(0, 100)}...</small>`;
+                statusText.textContent = "❌ Upload Failed";
+
+                if (resultArea) {
+                    resultArea.innerHTML = `
+                      <div style="color: #f44336; font-weight: bold;">エラー詳細:</div>
+                      <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; overflow-x: auto; color: #ff8a80;">${xhr.status} ${xhr.statusText}\n${xhr.responseText}</pre>
+                    `;
+                }
             }
         };
 
         xhr.onerror = () => {
             console.error("[DEBUG] Network Error during XHR");
             statusText.className = 'status-error';
-            statusText.textContent = "❌ 通信エラー (CORS設定等を確認してください)";
+            statusText.textContent = "❌ Network Error";
+            const resultArea = document.getElementById('resultArea');
+            if (resultArea) {
+                resultArea.innerHTML = `<div style="color: #f44336;">通信エラーが発生しました。<br>CORS設定やネットワーク接続を確認してください。</div>`;
+            }
         };
 
         xhr.send(file);

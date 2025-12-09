@@ -44,24 +44,39 @@ export async function onRequest(context) {
   // Host setup
   const host = `${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
 
-  // NOTE: Depending on how the file name is used, we might need cleaner encoding.
-  // We use encodeURIComponent to ensure special chars are safe in the path.
+  // NOTE: R2/S3 requires specific encoding for the signature path calculation.
+  // Standard encodeURIComponent encodes spaces as %20, which is correct for S3 path.
+  // However, we must ensure consistency between the signed path and the actual requested path.
   const encodedFileName = encodeURIComponent(fileName);
-  const endpoint = `https://${host}/${R2_BUCKET_NAME}/${encodedFileName}`;
+
+  const objectPath = `/${R2_BUCKET_NAME}/${encodedFileName}`;
+  const endpoint = `https://${host}${objectPath}`;
 
   // Canonical Request components
-  const canonicalUri = `/${R2_BUCKET_NAME}/${encodedFileName}`;
+  // 1. Canonical URI
+  const canonicalUri = objectPath;
+
+  // 2. Canonical Query String
+  // Must be sorted by param name.
+  // We are generating new params, so we define them in order.
+  const credential = `${R2_ACCESS_KEY_ID}/${dateStamp}/${REGION}/${SERVICE}/aws4_request`;
   const canonicalQuerystring = [
     `X-Amz-Algorithm=AWS4-HMAC-SHA256`,
-    `X-Amz-Credential=${encodeURIComponent(`${R2_ACCESS_KEY_ID}/${dateStamp}/${REGION}/${SERVICE}/aws4_request`)}`,
+    `X-Amz-Credential=${encodeURIComponent(credential)}`,
     `X-Amz-Date=${amzDate}`,
     `X-Amz-Expires=${EXPIRATION}`,
     `X-Amz-SignedHeaders=host`
   ].join("&");
 
+  // 3. Canonical Headers
+  // Must end with newline
   const canonicalHeaders = `host:${host}\n`;
+
+  // 4. Signed Headers
   const signedHeaders = "host";
-  const payloadHash = "UNSIGNED-PAYLOAD"; // For presigned URLs, payload can be unsigned
+
+  // 5. Payload Hash
+  const payloadHash = "UNSIGNED-PAYLOAD";
 
   const canonicalRequest = [
     METHOD,
@@ -71,6 +86,7 @@ export async function onRequest(context) {
     signedHeaders,
     payloadHash
   ].join("\n");
+
 
   // String to Sign
   const algorithm = "AWS4-HMAC-SHA256";
