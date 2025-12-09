@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>ファイルアップロード</title>
+    <link rel="stylesheet" href="./css/style.css" />
+</head>
+
+<body>
+    <h1>新規アップロード</h1>
+
+    <div id="dropZone">
+        ここにファイルをドラッグ＆ドロップ<br>
+        またはクリックして選択
+    </div>
+
+    <input id="fileInput" type="file" style="display:none;" />
+
+    <div id="progressWrap" style="display:none;">
+        <progress id="progressBar" value="0" max="100"></progress>
+        <p id="status">待機中…</p>
+    </div>
+
+    <script src="./js/upload-ui.js"></script>
+</body>
+
+</html>
