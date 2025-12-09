@@ -26,42 +26,67 @@ fileInput.onchange = () => {
 };
 
 async function upload(file) {
+    console.log("[DEBUG] Upload started for:", file.name);
+
+    // UI Reset
     progressWrap.style.display = "block";
-    // Reset status
     statusText.className = 'status-processing';
     statusText.textContent = `⏳ 署名URL取得中…`;
 
-    const res = await fetch(`/generateUploadUrl?name=${encodeURIComponent(file.name)}`);
-    const { uploadUrl } = await res.json();
+    try {
+        // 1. Get Presigned URL
+        console.log("[DEBUG] Fetching upload URL...");
+        const res = await fetch(`/generateUploadUrl?name=${encodeURIComponent(file.name)}`);
 
-    statusText.textContent = "🚀 アップロード中…";
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("PUT", uploadUrl, true);
-    xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
-
-    xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-            const percent = Math.round((e.loaded / e.total) * 100);
-            progressBar.value = percent;
-            statusText.textContent = `🚀 アップロード中… ${percent}%`;
+        if (!res.ok) {
+            const errText = await res.text();
+            console.error("[DEBUG] Failed to get upload URL:", res.status, errText);
+            throw new Error(`署名URL取得エラー: ${res.status} - ${errText}`);
         }
-    };
 
-    xhr.onload = () => {
-        if (xhr.status === 200) {
-            statusText.className = 'status-success';
-            statusText.innerHTML = "✅ アップロード完了！<br>一覧画面に戻るか、続けてファイルをドロップしてください。";
-            progressBar.value = 100;
-        } else {
+        const { uploadUrl } = await res.json();
+        console.log("[DEBUG] Got upload URL:", uploadUrl);
+
+        // 2. Perform PUT Upload
+        statusText.textContent = "🚀 アップロード中…";
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", uploadUrl, true);
+        xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+
+        xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                progressBar.value = percent;
+                statusText.textContent = `🚀 アップロード中… ${percent}%`;
+            }
+        };
+
+        xhr.onload = () => {
+            console.log("[DEBUG] XHR State:", xhr.readyState, "Status:", xhr.status);
+            if (xhr.status === 200 || xhr.status === 201) {
+                console.log("[DEBUG] Upload success!");
+                statusText.className = 'status-success';
+                statusText.innerHTML = "✅ アップロード完了！<br>一覧画面に戻るか、続けてファイルをドロップしてください。";
+                progressBar.value = 100;
+            } else {
+                console.error("[DEBUG] Upload failed. Response:", xhr.responseText);
+                statusText.className = 'status-error';
+                statusText.innerHTML = `❌ アップロード失敗: ${xhr.status}<br><small>${xhr.responseText.substring(0, 100)}...</small>`;
+            }
+        };
+
+        xhr.onerror = () => {
+            console.error("[DEBUG] Network Error during XHR");
             statusText.className = 'status-error';
-            statusText.textContent = `❌ エラー: ${xhr.status}`;
-        }
-    };
+            statusText.textContent = "❌ 通信エラー (CORS設定等を確認してください)";
+        };
 
-    xhr.onerror = () => {
+        xhr.send(file);
+
+    } catch (error) {
+        console.error("[DEBUG] Exception caught:", error);
         statusText.className = 'status-error';
-        statusText.textContent = "❌ 通信エラー";
-    };
-    xhr.send(file);
+        statusText.textContent = `❌ エラー: ${error.message}`;
+    }
 }

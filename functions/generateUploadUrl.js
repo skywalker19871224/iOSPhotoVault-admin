@@ -16,6 +16,7 @@ export async function onRequest(context) {
 
   // Basic validation of env vars
   if (!R2_ACCOUNT_ID || !R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET_NAME) {
+    console.error("Missing R2 Config: ", { R2_ACCOUNT_ID: !!R2_ACCOUNT_ID, R2_BUCKET_NAME: !!R2_BUCKET_NAME });
     return new Response(JSON.stringify({ error: "Missing R2 configuration environment variables." }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
@@ -42,10 +43,14 @@ export async function onRequest(context) {
 
   // Host setup
   const host = `${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
-  const endpoint = `https://${host}/${R2_BUCKET_NAME}/${encodeURIComponent(fileName)}`;
+
+  // NOTE: Depending on how the file name is used, we might need cleaner encoding.
+  // We use encodeURIComponent to ensure special chars are safe in the path.
+  const encodedFileName = encodeURIComponent(fileName);
+  const endpoint = `https://${host}/${R2_BUCKET_NAME}/${encodedFileName}`;
 
   // Canonical Request components
-  const canonicalUri = `/${R2_BUCKET_NAME}/${encodeURIComponent(fileName)}`;
+  const canonicalUri = `/${R2_BUCKET_NAME}/${encodedFileName}`;
   const canonicalQuerystring = [
     `X-Amz-Algorithm=AWS4-HMAC-SHA256`,
     `X-Amz-Credential=${encodeURIComponent(`${R2_ACCESS_KEY_ID}/${dateStamp}/${REGION}/${SERVICE}/aws4_request`)}`,
